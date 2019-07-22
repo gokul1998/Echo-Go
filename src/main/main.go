@@ -46,7 +46,5 @@ func main() {
 	g.GET("/main", mainAdmin)
 	e.GET("/", home)
 	e.GET("/cats/:type", getCats)
-	e.POST("/cats", addCats)
-	e.POST("/dogs", addDogs)
 	e.Start(":8000")
 }
