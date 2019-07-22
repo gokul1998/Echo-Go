@@ -49,6 +49,12 @@ func main() {
 	g.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `[${time_rfc3339}] ${status} ${method} ${host} ${latency_human}` + "\n",
 	}))
+	g.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+		if username == "gokul" && password == "12345" {
+			return true, nil
+		}
+		return false, nil
+	}))
 	g.GET("/main", mainAdmin)
 	e.GET("/", home)
 	e.GET("/cats/:type", getCats)
