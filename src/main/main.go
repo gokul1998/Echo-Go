@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 type Cat struct {
@@ -43,6 +44,11 @@ func main() {
 	fmt.Println("hellllo world")
 	e := echo.New()
 	g := e.Group("/admin")
+	//g.Use(middleware.Logger()) ->simple logger
+	//this is a logger with customized output
+	g.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: `[${time_rfc3339}] ${status} ${method} ${host} ${latency_human}` + "\n",
+	}))
 	g.GET("/main", mainAdmin)
 	e.GET("/", home)
 	e.GET("/cats/:type", getCats)
