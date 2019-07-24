@@ -73,10 +73,18 @@ func createJwtToken() (string, error) {
 	}
 	return token, nil
 }
+func mainJwt(c echo.Context) error {
+	return c.String(http.StatusOK, "you are on secret Jwt page")
+}
 func main() {
 	fmt.Println("hellllo world")
 	e := echo.New()
 	g := e.Group("/admin")
+	jwtgroup := e.Group("/jwt")
+	jwtgroup.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningMethod: "HS512",
+		SigningKey:    []byte("secretstring"),
+	}))
 	//cookiegroup := e.Group("/cookie")
 	g.Use(serverHeader)
 	//g.Use(middleware.Logger()) ->simple logger
@@ -90,6 +98,7 @@ func main() {
 		}
 		return false, nil
 	}))
+	jwtgroup.GET("/main", mainJwt)
 	e.GET("/login", login)
 	g.GET("/main", mainAdmin)
 	e.GET("/", home)
