@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -16,6 +18,10 @@ type Cat struct {
 type Dog struct {
 	Name string `json:"name"`
 	Age  string `json:"age"`
+}
+type JwtClaims struct {
+	Name string `json:"name"`
+	jwt.StandardClaims
 }
 
 func home(c echo.Context) error {
@@ -40,9 +46,32 @@ func login(c echo.Context) error {
 		cookie.Value = "some_value"
 		cookie.Expires = time.Now().Add(10 * time.Minute)
 		c.SetCookie(cookie)
-		return c.String(http.StatusOK, "you are logged in")
+		token, err := createJwtToken()
+		if err != nil {
+			log.Println("error in creating JWT tokens")
+			return c.String(http.StatusInternalServerError, "something went wrong")
+		}
+		return c.JSON(http.StatusOK, map[string]string{
+			"message": "you are logged in",
+			"token":   token,
+		})
 	}
 	return c.String(http.StatusUnauthorized, "enter the correct credentials")
+}
+func createJwtToken() (string, error) {
+	claims := JwtClaims{
+		"jack",
+		jwt.StandardClaims{
+			Id:        "user_id",
+			ExpiresAt: time.Now().Add(24 * time.Hour).Unix(),
+		},
+	}
+	rawToken := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
+	token, err := rawToken.SignedString([]byte("secretstring"))
+	if err != nil {
+		return "", nil
+	}
+	return token, nil
 }
 func main() {
 	fmt.Println("hellllo world")
