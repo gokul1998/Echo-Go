@@ -74,6 +74,10 @@ func createJwtToken() (string, error) {
 	return token, nil
 }
 func mainJwt(c echo.Context) error {
+	user := c.Get("user")
+	token := user.(*jwt.Token)
+	claim := token.Claims.(jwt.MapClaims)
+	log.Println("username : ", claim["name"], " expires in : ", claim["exp"], " user_id : ", claim["jti"])
 	return c.String(http.StatusOK, "you are on secret Jwt page")
 }
 func main() {
