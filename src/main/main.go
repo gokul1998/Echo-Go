@@ -84,6 +84,7 @@ func main() {
 	fmt.Println("hellllo world")
 	e := echo.New()
 	g := e.Group("/admin")
+	e.Use(middleware.Static("./"))
 	jwtgroup := e.Group("/jwt")
 	jwtgroup.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningMethod: "HS512",
